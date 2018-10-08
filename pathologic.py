@@ -12,9 +12,6 @@ class Pathologic(Problem):
         self.found = False
         self.c = -1
         self.r = -1
-        if self.goal_test(state):
-            self.found = True
-            print(state)
         if not self.found:
             for r in range(0, state.nbr):
                 for c in range(0, state.nbc):
@@ -28,6 +25,7 @@ class Pathologic(Problem):
                     newState.grid[self.r][self.c-1] = "$"
                     if state.grid[self.r][self.c-1] == "_":
                         newState.count -= 1
+                        print(newState)
                     yield ("left", newState)
             if self.c+1 < state.nbc:
                 if state.grid[self.r][self.c+1] == "0" or state.grid[self.r][self.c+1] == "_":
@@ -36,6 +34,7 @@ class Pathologic(Problem):
                     newState.grid[self.r][self.c+1] = "$"
                     if state.grid[self.r][self.c+1] == "_":
                         newState.count -= 1
+                        print(newState)
                     yield ("right", newState)
             if self.r-1 >= 0:
                 if state.grid[self.r-1][self.c] == "0" or state.grid[self.r-1][self.c] == "_":
@@ -44,6 +43,7 @@ class Pathologic(Problem):
                     newState.grid[self.r-1][self.c] = "$"
                     if state.grid[self.r-1][self.c] == "_":
                         newState.count -= 1
+                        print(newState)
                     yield ("top", newState)
             if self.r+1 < state.nbr :
                 if state.grid[self.r+1][self.c] == "0" or state.grid[self.r+1][self.c] == "_":
@@ -52,7 +52,9 @@ class Pathologic(Problem):
                     newState.grid[self.r+1][self.c] = "$"
                     if state.grid[self.r][self.c-1] == "_":
                         newState.count -= 1
+                        print(newState)
                     yield ("down", newState)
+
 
     def goal_test(self, state):
         return state.count == 0
