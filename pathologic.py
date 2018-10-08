@@ -12,40 +12,47 @@ class Pathologic(Problem):
         self.found = False
         self.c = -1
         self.r = -1
-        for r in range(0, state.nbr):
-            for c in range(0, state.nbc):
-                if state.grid[r][c] == '$':
-                    self.c = c
-                    self.r = r
-        print(self.r ,self.c)
-        if state.grid[self.r][self.c-1] == "0" or state.grid[self.r][self.c-1] == "_":
-            newState = copy.deepcopy(state)
-            newState.grid[self.r][self.c] = "x"
-            newState.grid[self.r][self.c-1] = "$"
-            if state.grid[self.r][self.c-1] == "_":
-                newState.count -= 1
-            print(newState)
-        if state.grid[self.r][self.c+1] == "0" or state.grid[self.r][self.c+1] == "_":
-            newState = copy.deepcopy(state)
-            newState.grid[self.r][self.c] = "x"
-            newState.grid[self.r][self.c+1] = "$"
-            if state.grid[self.r][self.c+1] == "_":
-                newState.count -= 1
-            print(newState)
-        if state.grid[self.r-1][self.c] == "0" or state.grid[self.r-1][self.c] == "_":
-            newState = copy.deepcopy(state)
-            newState.grid[self.r][self.c] = "x"
-            newState.grid[self.r-1][self.c] = "$"
-            if state.grid[self.r-1][self.c] == "_":
-                newState.count -= 1
-            print(newState)
-        if state.grid[self.r+1][self.c] == "0" or state.grid[self.r][self.c-1] == "_":
-            newState = copy.deepcopy(state)
-            newState.grid[self.r][self.c] = "x"
-            newState.grid[self.r+1][self.c] = "$"
-            if state.grid[self.r][self.c-1] == "_":
-                newState.count -= 1
-            print(newState)
+        if self.goal_test(state):
+            self.found = True
+            print(state)
+        if not self.found:
+            for r in range(0, state.nbr):
+                for c in range(0, state.nbc):
+                    if state.grid[r][c] == '$':
+                        self.c = c
+                        self.r = r
+            if self.c >= 0:
+                if state.grid[self.r][self.c-1] == "0" or state.grid[self.r][self.c-1] == "_":
+                    newState = copy.deepcopy(state)
+                    newState.grid[self.r][self.c] = "x"
+                    newState.grid[self.r][self.c-1] = "$"
+                    if state.grid[self.r][self.c-1] == "_":
+                        newState.count -= 1
+                    yield ("left", newState)
+            if self.c+1 < state.nbc:
+                if state.grid[self.r][self.c+1] == "0" or state.grid[self.r][self.c+1] == "_":
+                    newState = copy.deepcopy(state)
+                    newState.grid[self.r][self.c] = "x"
+                    newState.grid[self.r][self.c+1] = "$"
+                    if state.grid[self.r][self.c+1] == "_":
+                        newState.count -= 1
+                    yield ("right", newState)
+            if self.r-1 >= 0:
+                if state.grid[self.r-1][self.c] == "0" or state.grid[self.r-1][self.c] == "_":
+                    newState = copy.deepcopy(state)
+                    newState.grid[self.r][self.c] = "x"
+                    newState.grid[self.r-1][self.c] = "$"
+                    if state.grid[self.r-1][self.c] == "_":
+                        newState.count -= 1
+                    yield ("top", newState)
+            if self.r+1 < state.nbr :
+                if state.grid[self.r+1][self.c] == "0" or state.grid[self.r+1][self.c] == "_":
+                    newState = copy.deepcopy(state)
+                    newState.grid[self.r][self.c] = "x"
+                    newState.grid[self.r+1][self.c] = "$"
+                    if state.grid[self.r][self.c-1] == "_":
+                        newState.count -= 1
+                    yield ("down", newState)
 
     def goal_test(self, state):
         return state.count == 0
@@ -96,7 +103,6 @@ def readInstanceFile(filename):
 
 grid_init = readInstanceFile(sys.argv[1])
 init_state = State(grid_init)
-print(init_state)
 
 problem = Pathologic(init_state)
 
