@@ -23,42 +23,35 @@ class Pathologic(Problem):
                     newState = copy.deepcopy(state)
                     newState.grid[self.r][self.c] = "x"
                     newState.grid[self.r][self.c-1] = "$"
-                    if state.grid[self.r][self.c-1] == "_":
-                        newState.count -= 1
-                        print(newState)
                     yield ("left", newState)
             if self.c+1 < state.nbc:
                 if state.grid[self.r][self.c+1] == "0" or state.grid[self.r][self.c+1] == "_":
                     newState = copy.deepcopy(state)
                     newState.grid[self.r][self.c] = "x"
                     newState.grid[self.r][self.c+1] = "$"
-                    if state.grid[self.r][self.c+1] == "_":
-                        newState.count -= 1
-                        print(newState)
                     yield ("right", newState)
             if self.r-1 >= 0:
                 if state.grid[self.r-1][self.c] == "0" or state.grid[self.r-1][self.c] == "_":
                     newState = copy.deepcopy(state)
                     newState.grid[self.r][self.c] = "x"
                     newState.grid[self.r-1][self.c] = "$"
-                    if state.grid[self.r-1][self.c] == "_":
-                        newState.count -= 1
-                        print(newState)
                     yield ("top", newState)
             if self.r+1 < state.nbr :
                 if state.grid[self.r+1][self.c] == "0" or state.grid[self.r+1][self.c] == "_":
                     newState = copy.deepcopy(state)
                     newState.grid[self.r][self.c] = "x"
                     newState.grid[self.r+1][self.c] = "$"
-                    if state.grid[self.r][self.c-1] == "_":
-                        newState.count -= 1
-                        print(newState)
                     yield ("down", newState)
 
 
-    def goal_test(self, state):
-        return state.count == 0
 
+    def goal_test(self, state):
+        count = 0
+        for r in range(state.nbr):
+            for c in range(state.nbc):
+                if state.grid[r][c] == '_':
+                    count += 1
+        return count == 0
 
 ###############
 # State class #
@@ -69,12 +62,7 @@ class State:
         self.nbr = len(grid)
         self.nbc = len(grid[0])
         self.grid = grid
-        self.count = 0
 
-        for x in range(0,self.nbr):
-            for z in range(0,self.nbc):
-                if grid[x][z] == "_":
-                    self.count+=1
 
     def __str__(self):
         s = ""
@@ -110,6 +98,7 @@ problem = Pathologic(init_state)
 
 # example of bfs graph search
 node = breadth_first_graph_search(problem)
+
 
 # example of print
 path = node.path()
