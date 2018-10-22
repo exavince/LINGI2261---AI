@@ -21,36 +21,40 @@ class Pacmen(Problem):
         list_state = []
 
         if self.c - 1 >= 0:
-            if state.grid[self.r][self.c - 1] == " ":
+            if state.grid[self.r][self.c - 1] == " " or state.grid[self.r][self.c-1] == "@":
                 newState = State(self.grid_copy(state))
                 newState.grid[self.r][self.c - 1] = "$"
+                newState.grid[self.r][self.c] = " "
                 if state.grid[self.r][self.c - 1] != "@":
                     yield ("left", newState)
                 else:
                     list_action.append("left")
                     list_state.append(newState)
         if self.c + 1 < state.nbc:
-            if state.grid[self.r][self.c + 1] == " ":
+            if state.grid[self.r][self.c + 1] == " " or state.grid[self.r][self.c+1] == "@":
                 newState = State(self.grid_copy(state))
                 newState.grid[self.r][self.c + 1] = "$"
+                newState.grid[self.r][self.c] = " "
                 if state.grid[self.r][self.c + 1] != "@":
                     yield ("right", newState)
                 else:
                     list_action.append("right")
                     list_state.append(newState)
         if self.r - 1 >= 0:
-            if state.grid[self.r - 1][self.c] == " ":
+            if state.grid[self.r - 1][self.c] == " " or state.grid[self.r-1][self.c] == "@":
                 newState = State(self.grid_copy(state))
                 newState.grid[self.r - 1][self.c] = "$"
+                newState.grid[self.r][self.c] = " "
                 if state.grid[self.r - 1][self.c] != "@":
                     yield ("top", newState)
                 else:
                     list_action.append("top")
                     list_state.append(newState)
         if self.r + 1 < state.nbr:
-            if state.grid[self.r + 1][self.c] == " ":
+            if state.grid[self.r + 1][self.c] == " " or state.grid[self.r+1][self.c] == "@":
                 newState = State(self.grid_copy(state))
                 newState.grid[self.r + 1][self.c] = "$"
+                newState.grid[self.r][self.c] = " "
                 if state.grid[self.r + 1][self.c] != "@":
                     yield ("down", newState)
                 else:
@@ -130,7 +134,7 @@ def readInstanceFile(filename):
 # Heuristic function #
 ######################
 def heuristic(node):
-    h = 0.0
+    h = node.path_cost
     # ...
     # compute an heuristic value
     # ...
@@ -140,12 +144,12 @@ def heuristic(node):
 # Launch the search #
 #####################
 #begin = time.time()
-grid_init,nsharp = readInstanceFile(sys.argv[1])
+grid_init, nsharp = readInstanceFile(sys.argv[1])
 init_state = State(grid_init)
 
 problem = Pacmen(init_state)
 
-node = astar_graph_search(problem,heuristic)
+node = astar_graph_search(problem, heuristic)
 
 # example of print
 path = node.path()
