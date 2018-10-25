@@ -11,60 +11,57 @@ class Pacmen(Problem):
 
     def successor(self, state):
         # Find where is the player
+        pac_list = []
+        action_list = []
+        state_list = [state]
+
         for r in range(0, state.nbr):
             for c in range(0, state.nbc):
                 if state.grid[r][c] == '$':
-                    self.c = c
-                    self.r = r
+                    pac_list.append([r,c])
 
-        list_action = []
-        list_state = []
 
-        if self.c - 1 >= 0:
-            if state.grid[self.r][self.c - 1] == " " or state.grid[self.r][self.c-1] == "@":
-                newState = State(self.grid_copy(state))
-                newState.grid[self.r][self.c - 1] = "$"
-                newState.grid[self.r][self.c] = " "
-                if state.grid[self.r][self.c - 1] != "@":
-                    yield ("left", newState)
-                else:
-                    list_action.append("left")
-                    list_state.append(newState)
-        if self.c + 1 < state.nbc:
-            if state.grid[self.r][self.c + 1] == " " or state.grid[self.r][self.c+1] == "@":
-                newState = State(self.grid_copy(state))
-                newState.grid[self.r][self.c + 1] = "$"
-                newState.grid[self.r][self.c] = " "
-                if state.grid[self.r][self.c + 1] != "@":
-                    yield ("right", newState)
-                else:
-                    list_action.append("right")
-                    list_state.append(newState)
-        if self.r - 1 >= 0:
-            if state.grid[self.r - 1][self.c] == " " or state.grid[self.r-1][self.c] == "@":
-                newState = State(self.grid_copy(state))
-                newState.grid[self.r - 1][self.c] = "$"
-                newState.grid[self.r][self.c] = " "
-                if state.grid[self.r - 1][self.c] != "@":
-                    yield ("top", newState)
-                else:
-                    list_action.append("top")
-                    list_state.append(newState)
-        if self.r + 1 < state.nbr:
-            if state.grid[self.r + 1][self.c] == " " or state.grid[self.r+1][self.c] == "@":
-                newState = State(self.grid_copy(state))
-                newState.grid[self.r + 1][self.c] = "$"
-                newState.grid[self.r][self.c] = " "
-                if state.grid[self.r + 1][self.c] != "@":
-                    yield ("down", newState)
-                else:
-                    list_action.append("down")
-                    list_state.append(newState)
+        for pac in pac_list:
+            action2 = []
+            state2 = []
+            self.r = pac[0]
+            self.c = pac[1]
 
-        counter = 0
-        for i in list_state:
-            yield (list_action[counter], i)
-            counter + 1
+            for stateX in state_list:
+
+                if self.c - 1 >= 0:
+                    if stateX.grid[self.r][self.c - 1] == " " or state.grid[self.r][self.c-1] == "@":
+                        newState = State(self.grid_copy(stateX))
+                        newState.grid[self.r][self.c - 1] = "$"
+                        newState.grid[self.r][self.c] = " "
+                        state2.append(newState)
+                        action2.append("left")
+                if self.c + 1 < state.nbc:
+                    if state.grid[self.r][self.c + 1] == " " or state.grid[self.r][self.c+1] == "@":
+                        newState = State(self.grid_copy(stateX))
+                        newState.grid[self.r][self.c + 1] = "$"
+                        newState.grid[self.r][self.c] = " "
+                        state2.append(newState)
+                        action2.append("right")
+                if self.r - 1 >= 0:
+                    if state.grid[self.r - 1][self.c] == " " or state.grid[self.r-1][self.c] == "@":
+                        newState = State(self.grid_copy(stateX))
+                        newState.grid[self.r - 1][self.c] = "$"
+                        newState.grid[self.r][self.c] = " "
+                        state2.append(newState)
+                        action2.append("top")
+                if self.r + 1 < state.nbr:
+                    if state.grid[self.r + 1][self.c] == " " or state.grid[self.r+1][self.c] == "@":
+                        newState = State(self.grid_copy(stateX))
+                        newState.grid[self.r + 1][self.c] = "$"
+                        newState.grid[self.r][self.c] = " "
+                        state2.append(newState)
+                        action2.append("down")
+            action_list = action2
+            state_list = state2
+
+        for i in range(len(state_list)):
+            yield (action_list[i], state_list[i])
 
 
     def goal_test(self, state):
@@ -128,6 +125,15 @@ def readInstanceFile(filename):
     m = len(lines[0])
     grid_init = [[lines[i][j] for j in range(1, m, 2)] for i in range(0, n)]
     return grid_init,nsharp
+
+def changeMatrix(state):
+    x = 1;
+    for i in range(0, state.nbr):
+        for j in range (0, state.nbc):
+            if state.grid[i][j] == "$":
+                state.grid[i][j] = x
+    return state, x-1
+
 
 
 ######################
