@@ -20,6 +20,8 @@ class Pacmen(Problem):
                 if state.grid[r][c] == '$':
                     pac_list.append([r,c])
 
+        while pacVeat(state, pac_list):
+            pac_list.remove(maxPac(state, pac_list))
 
         for pac in pac_list:
             action2 = []
@@ -63,7 +65,6 @@ class Pacmen(Problem):
         for i in range(len(state_list)):
             yield (action_list[i], state_list[i])
 
-
     def goal_test(self, state):
         count = 0
         for r in range(state.nbr):
@@ -85,7 +86,6 @@ class State:
         self.nbr = len(grid)
         self.nbc = len(grid[0])
         self.grid = grid
-        #self.grid = tuple([ tuple(grid[i]) for i in range(0,self.nbr) ])
 
     def __str__(self):
         s = ""
@@ -111,7 +111,6 @@ class State:
 
     def __hash__(self):
         return hash(tuple([tuple(self.grid[i]) for i in range(0, len(self.grid))]))
-        #return hash(self.grid)
 
 
 ######################
@@ -126,21 +125,47 @@ def readInstanceFile(filename):
     grid_init = [[lines[i][j] for j in range(1, m, 2)] for i in range(0, n)]
     return grid_init,nsharp
 
-def changeMatrix(state):
-    x = 1;
-    for i in range(0, state.nbr):
-        for j in range (0, state.nbc):
-            if state.grid[i][j] == "$":
-                state.grid[i][j] = x
-    return state, x-1
+def pacVeat(state, pac_list):
+    result = len(pac_list)
+    for r in range(0, state.nbr):
+        for c in range(0, state.nbc):
+            if state.grid[r][c] == '@':
+                result = result - 1
+    if result > 0:
+        return True
+    else:
+        return False
 
+def maxPac(state, pac_list):
+    candy = []
+    for r in range(0, state.nbr):
+        for c in range(0, state.nbc):
+            if state.grid[r][c] == '@':
+                candy.append([r, c])
+
+    pac = []
+    min_pac = []
+    for player in pac_list:
+        distance = 200
+        min = 0
+        for x in candy:
+            distance = abs(x[0] - player[0]) + abs(x[1] - player[1])
+            if distance < min:
+                min = distance
+        min_pac.append(min)
+
+    min = 0
+    for i in range(len(min_pac)):
+        if min_pac[i] >= min:
+            min = min_pac[i]
+            pac = pac_list[i]
+    return pac
 
 
 ######################
 # Heuristic function #
 ######################
 def heuristic(node):
-    #h = node.path_cost
     h = 0.0
     pac_list = []
     candy = []
@@ -151,22 +176,32 @@ def heuristic(node):
             if node.state.grid[r][c] == '@':
                 candy.append([r, c])
 
-    distances = []
-    for x in candy:
-        for player in pac_list:
-            distance = abs(x[0] - player[0]) + abs(x[1] - player[1])
-            distances.append(distance)
-    if len(distances) == 0:
-        h= 0.0
-    else:
-        h = min(distances)
-    #print(h)
+    while candy:
+        distance = 200
+        eat = []
+        player = []
+
+        for player_tmp in pac_list:
+            for eat_tmp in candy:
+                calculation = abs(eat_tmp[0] - player_tmp[0]) + abs(eat_tmp[1] - player_tmp[1])
+                if distance >= calculation:
+                    distance = calculation
+                    eat = eat_tmp
+                    player = player_tmp
+
+        candy.remove(eat)
+        pac_list.remove(player)
+        pac_list.append(eat)
+
+        h = h + distance
+
     return h
+
 
 #####################
 # Launch the search #
 #####################
-#begin = time.time()
+# begin = time.time()
 grid_init, nsharp = readInstanceFile(sys.argv[1])
 init_state = State(grid_init)
 
@@ -178,7 +213,7 @@ node = astar_graph_search(problem, heuristic)
 path = node.path()
 path.reverse()
 
-#end = time.time()
+# end = time.time()
 
 print('Number of moves: ' + str(node.depth))
 for n in path:
