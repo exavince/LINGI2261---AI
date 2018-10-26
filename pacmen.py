@@ -140,6 +140,7 @@ def changeMatrix(state):
 # Heuristic function #
 ######################
 def heuristic(node):
+    #h = node.path_cost
     h = 0.0
     pac_list = []
     candy = []
@@ -148,12 +149,18 @@ def heuristic(node):
             if node.state.grid[r][c] == '$':
                 pac_list.append([r, c])
             if node.state.grid[r][c] == '@':
-                candy.append([r,c])
+                candy.append([r, c])
 
+    distances = []
     for x in candy:
         for player in pac_list:
-            distance = abs(x[0]-player[0]) + abs(x[1]-player[1])
-            h = min(h, distance)
+            distance = abs(x[0] - player[0]) + abs(x[1] - player[1])
+            distances.append(distance)
+    if len(distances) == 0:
+        h= 0.0
+    else:
+        h = min(distances)
+    #print(h)
     return h
 
 #####################
